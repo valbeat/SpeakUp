@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>タイトル</title>
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+  <script>
+  $(function() {
+    $.ajax({
+      url: '/', //呼び出すAPI
+      type: 'POST',
+      dataType: 'json', //APIが出力するデータのタイプ
+      contentType: 'application/json',
+      data: '{"id_to":"0383383","state":"IH"}' //APIが受け付けるパラメータ
+    }).done(function(data) {
+      console.log(data); //consoleに表示
+      console.log(data["statuscode"]);
+      alert('success!'); //alert表示
+    }).fail(function(data) {
+      console.log(data);
+      alert('error!');
+    });
+  });
+  </script>
+</body>
+</html>

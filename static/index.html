@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <title>Hackathon0213</title>
+    <link rel="stylesheet" media="all" href="css/speakapp.css" data-turbolinks-track="true" />
+    <script src="js/jquery.js" data-turbolinks-track="true"></script>
+    <script src="js/speakapp.js"body="1" data-turbolinks-track="true"></script>
+    <script type="text/javascript" src="./js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="./js/msgpack.codec.js"></script>
+    <script type="text/javascript" src="./js/libspeexdsp.js"></script>
+    <script type="text/javascript" src="./js/resampler.min.js"></script>
+    <script type="text/javascript" src="./js/speechrec.min.js"></script>
+    <script type="text/javascript" src="./js/jquery-ui-1.10.4.min.js"></script>
+    <script type="text/javascript" src="./js/sample-preference-view.js"></script>
+    <script type="text/javascript" src="./js/sample-recognition-view.js"></script>
+    <script type="text/javascript">
+
+    $(document).ready(function(){
+      SpeechRec.config({ 'ApiKey':'6164334f445a527577746e64627576717a625841623443556f794f625372617a4d37717635526d50712e39' });
+      SpeechRec.on_result(function(result){
+        // 認識結果をテキストボックスに表示
+        $('#result_textarea').val(result.candidates[0].speech);
+
+        var context = new AudioContext();
+
+        function tts(input) {
+          var textToSpeech = function() {
+
+            var url = 'https://api.apigw.smt.docomo.ne.jp/virtualNarrator/v1/textToSpeech';
+            var APIKEY = '6164334f445a527577746e64627576717a625841623443556f794f625372617a4d37717635526d50712e39';
+
+            var request = new XMLHttpRequest();
+            request.open('POST', url + '?APIKEY=' + APIKEY);
+            request.responseType = 'arraybuffer';
+             //request.responseType = 'application/json';
+            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            request.onload = function(evt) {
+              var onDecode = function(buf) {
+                playSound(buf);
+              };
+
+              var onDecodeError = function(err) {
+                console.log('onDecodeError:', err);
+              };
+
+              context.decodeAudioData(request.response, onDecode, onDecodeError);
+
+              function playSound(buffer) {
+                var source = context.createBufferSource();
+                source.buffer = buffer;
+                source.connect(context.destination);
+                source.start(0);
+              }
+            };
+            var url = 'https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue';
+            var APIKEY = '4132387542305945724c6e71766a46507a4c2e363566436f67664644567053444e5230324c565465716f42';
+            var req = function(utt) {
+              var request = new XMLHttpRequest();
+              request.open('POST', url + '?APIKEY=' + APIKEY);
+              request.responseType = 'application/json';
+              request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+              // 結果のロード時に実行される関数
+              request.onload = function(evt) {
+
+                console.log(request.response);
+
+                // JSONにパースしてサーバーに送る用のデータを作成
+                requestJson = JSON.parse(request.response);
+                message =  '{ "VRResult" : "' + requestJson.yomi + '" }'
+
+                // Ajaxでデータを送信
+                $.ajax({
+                  url: '/vrresult', //呼び出すAPI
+                  type: 'POST',
+                  dataType: 'json', //APIが出力するデータのタイプ
+                  contentType: 'application/json',
+                  data: message //APIが受け付けるパラメータ
+                }).done(function(data) {
+                  console.log(data); //consoleに表示
+                }).fail(function(data) {
+                  console.log(data);
+                });
+              }
+              var params = {"utt": utt};
+              var body = Object.keys(params).map(function(key) {
+                return key + '=' + params[key]
+              }).join('&');
+              request.send(JSON.stringify(params));
+            }
+
+            var new_txt = JSON.stringify(result, undefined, 2);
+            req(new_txt);
+
+            //送信するパラメータを設定
+            var params = {
+              text:request.response,
+              speaker: 'hikari',
+            };
+            //送信する body 文字列を作成
+            var body = Object.keys(params).map(function(key) {
+              return key + '=' + params[key]
+            }).join('&');
+            request.send(body);
+          }
+          textToSpeech();
+        }
+        tts();
+
+      var Self = window.Self = {};
+      Self.resize_content = function(){
+        var ww = document.documentElement.clientWidth;
+        var wh = document.documentElement.clientHeight;
+
+        var cw = jQuery('#content_div').css('width').replace(/px$/, '');
+        var ch = jQuery('#content_div').css('height').replace(/px$/, '');
+
+        var cx = (ww - cw) / 2;
+        var cy = (wh - ch) / 2;
+
+        jQuery('#content_div').css('left', cx).css('top', cy);
+      };
+      Self.resize_content();
+      jQuery(window).resize(function(){
+        Self.resize_content();
+      });
+
+      SpeechRec.config({ 'OpusWorkerUrl':'./js/libopus.worker.js' });
+
+    window.setTimeout(function(){
+      jQuery('#start_button').attr('disabled', true);
+      }, 100);
+
+    });
+
+    </script>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='top'></div>
+      <div class='contents'>
+        <div class='right box'></div>
+        <div class='center box'>
+          <div class='character'>
+            <img id="character" src="img/anime.gif" alt="Anime" />
+          </div>
+        </div>
+        <div class='left box'></div>
+      </div>
+    </div>
+  </body>
+</html>

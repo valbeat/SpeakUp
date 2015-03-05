@@ -1,0 +1,38 @@
+/* line 1, /Users/koji_dev/Documents/workspace/hackathon0213/app/assets/stylesheets/speakapps.scss */
+.container {
+  width: 1280px;
+  height: 720px;
+  background-image: url("../img/situation.jpg");
+}
+
+/* line 6, /Users/koji_dev/Documents/workspace/hackathon0213/app/assets/stylesheets/speakapps.scss */
+.top {
+  background-color: rgba(255, 255, 255, 0);
+  position: relative;
+  height: 40%;
+  width: 100%;
+}
+
+/* line 12, /Users/koji_dev/Documents/workspace/hackathon0213/app/assets/stylesheets/speakapps.scss */
+.contents {
+  position: relative;
+  height: 60%;
+  width: 100%;
+}
+
+/* line 24, /Users/koji_dev/Documents/workspace/hackathon0213/app/assets/stylesheets/speakapps.scss */
+.box {
+  float: left;
+  width: 33%;
+  height: 100%;
+}
+
+/* line 28, /Users/koji_dev/Documents/workspace/hackathon0213/app/assets/stylesheets/speakapps.scss */
+.character {
+  margin-top: 15%;
+  margin-left: 10%;
+}
+/* line 31, /Users/koji_dev/Documents/workspace/hackathon0213/app/assets/stylesheets/speakapps.scss */
+.character img {
+  height: 300px;
+}
